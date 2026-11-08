@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>심장 비밀 연구소: 4대 암호 해독 (중2 과학)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    input, textarea {
+      user-select: text;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      14% { transform: scale(1.1); }
+      28% { transform: scale(1.02); }
+      42% { transform: scale(1.15); }
+      70% { transform: scale(1); }
+    }
+    .heart-pump {
+      animation: heartbeat 1.4s ease-in-out infinite;
+      transform-origin: center;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .touch-btn {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .touch-btn:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-between p-3 sm:p-6 overflow-x-hidden selection:bg-rose-500 selection:text-white">
+
+  <!-- Top Navigation & Status Bar -->
+  <header class="w-full max-w-2xl flex items-center justify-between py-2 px-1 mb-2">
+    <div class="flex items-center gap-2.5">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-400 p-0.5 shadow-lg shadow-rose-900/40">
+        <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center">
+          <svg class="w-5 h-5 text-rose-500 heart-pump" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base sm:text-lg font-black tracking-tight text-white">심장 비밀 연구소</h1>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500/20 text-rose-400 border border-rose-500/30">ESCAPE ROOM</span>
+        </div>
+        <p class="text-xs text-slate-400 font-medium">미래엔 중2 과학 212~213쪽 연계 퀘스트</p>
+      </div>
+    </div>
+
+    <!-- Right Controls: Audio & User Badge -->
+    <div class="flex items-center gap-2">
+      <button id="btn-sound" onclick="toggleSound()" class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700/80 flex items-center justify-center text-slate-300 hover:text-white hover:border-slate-500 touch-btn" title="효과음 켜기/끄기">
+        <span id="sound-icon">🔊</span>
+      </button>
+      <div id="user-badge" class="hidden text-right pl-2 border-l border-slate-800">
+        <div id="badge-name" class="text-xs font-bold text-rose-400 leading-tight"></div>
+        <div id="badge-id" class="text-[10px] text-slate-400 font-mono leading-tight"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Progress Bar Header -->
+  <div id="progress-wrapper" class="w-full max-w-2xl mb-3 hidden">
+    <div class="flex justify-between items-center text-xs font-semibold px-1 mb-1.5">
+      <span class="text-slate-400 flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        보안 시스템 통과 진행도
+      </span>
+      <span id="stage-text" class="text-rose-400 font-mono font-bold">STAGE 1 / 4</span>
+    </div>
+    <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-800">
+      <div id="progress-bar" class="h-full bg-gradient-to-r from-rose-500 via-amber-400 to-emerald-400 rounded-full transition-all duration-500 ease-out w-1/4"></div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="w-full max-w-2xl glass-card rounded-3xl p-5 sm:p-7 shadow-2xl relative overflow-hidden my-auto">
+
+    <!-- LOBBY SCREEN -->
+    <section id="screen-lobby" class="space-y-6">
+      <div class="text-center space-y-3">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-rose-500/10 border border-rose-500/20 text-4xl shadow-inner">
+          🫀
+        </div>
+        <div>
+          <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">심장 제어소 비상 잠금</h2>
+          <p class="text-xs sm:text-sm text-slate-300 mt-1.5 max-w-md mx-auto leading-relaxed">
+            체내 혈액 순환 메인 게이트가 비상 폐쇄되었습니다.<br>
+            <strong class="text-amber-400 font-bold underline underline-offset-4">교과서 212~213쪽</strong>을 정독하여 4대 보안 코드를 해독하세요!
+          </p>
+        </div>
+      </div>
+
+      <!-- Lab Pass Notice Box -->
+      <div class="p-4 rounded-2xl bg-gradient-to-br from-rose-950/60 to-slate-900 border border-rose-500/30 text-xs sm:text-sm space-y-2">
+        <div class="flex items-center gap-2 text-rose-300 font-bold">
+          <span class="text-base">🎫</span>
+          <span>연구실 입장 및 시식 프리패스 규칙</span>
+        </div>
+        <p class="text-slate-300 text-xs leading-relaxed">
+          4단계 관문을 모두 스스로 풀어 최종 인증 화면을 교사에게 인증한 학생만 <strong class="text-white font-semibold">돼지 심장 촉진 관찰 및 쫄깃한 염통 시식 코너</strong>에 입장할 수 있습니다.
+        </p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="form-lobby" onsubmit="handleStartGame(event)" class="space-y-4 pt-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">학번 (5자리)</label>
+            <input type="text" id="input-id" required placeholder="예: 20101" maxlength="10" inputmode="numeric"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 font-mono text-base transition">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">연구 요원 이름</label>
+            <input type="text" id="input-name" required placeholder="예: 김과학" maxlength="10"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 text-base transition">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-4 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 text-white font-extrabold text-base shadow-lg shadow-rose-900/40 touch-btn flex items-center justify-center gap-2 mt-2">
+          <span>교과서 펼치고 미션 시작</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- STAGE 1: 심장의 4개 방 (입구와 출구) -->
+    <section id="screen-stage1" class="hidden space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+        <span class="px-2.5 py-1 rounded-lg bg-blue-500/20 text-blue-400 font-black text-xs font-mono border border-blue-500/30">GATE 01</span>
+        <span class="text-xs text-slate-400">교과서 212~213쪽 상단</span>
+      </div>
+
+      <div class="space-y-1">
+        <h3 class="text-lg sm:text-xl font-bold text-white">Room 1: 심장의 입구와 출구 분별</h3>
+        <p class="text-xs sm:text-sm text-slate-300">
+          심장의 방 아래 구역을 터치해 구조를 살핀 뒤, 교과서 213쪽 설명과 일치하는 올바른 연결을 찾으세요.
+        </p>
+      </div>
+
+      <!-- Interactive SVG Heart Chambers -->
+      <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-800">
+        <div class="text-[11px] text-slate-400 text-center mb-1.5 font-medium">
+          💡 각 구역을 탭하여 이름과 연결 혈관을 확인해보세요! (관찰자 기준 좌우 반대)
+        </div>
+        <svg viewBox="0 0 400 210" class="w-full max-w-md mx-auto rounded-xl">
+          <!-- Frame -->
+          <rect x="5" y="5" width="390" height="200" rx="16" fill="#0b1329" stroke="#1e293b" stroke-width="2"/>
+          
+          <!-- 우심방 -->
+          <g id="box-ra" onclick="inspectChamber('우심방', '온몸을 돌고 온 피를 받아들이는 방! 대정맥과 연결.')" class="cursor-pointer transition group">
+            <rect x="20" y="20" width="170" height="75" rx="12" fill="#1e3a8a" class="hover:fill-blue-700 transition"/>
+            <text x="105" y="53" fill="#93c5fd" font-size="15" font-weight="bold" text-anchor="middle">우심방 (RA)</text>
+            <text x="105" y="75" fill="#bfdbfe" font-size="11" text-anchor="middle">피를 받아들임 (정맥)</text>
+          </g>
+
+          <!-- 좌심방 -->
+          <g id="box-la" onclick="inspectChamber('좌심방', '폐에서 산소를 얻고 돌아온 피를 받아들이는 방! 폐정맥과 연결.')" class="cursor-pointer transition group">
+            <rect x="210" y="20" width="170" height="75" rx="12" fill="#991b1b" class="hover:fill-rose-700 transition"/>
+            <text x="295" y="53" fill="#fca5a5" font-size="15" font-weight="bold" text-anchor="middle">좌심방 (LA)</text>
+            <text x="295" y="75" fill="#fecaca" font-size="11" text-anchor="middle">피를 받아들임 (정맥)</text>
+          </g>
+
+          <!-- 우심실 -->
+          <g id="box-rv" onclick="inspectChamber('우심실', '폐로 혈액을 뿜어내는 방! 폐동맥과 연결.')" class="cursor-pointer transition group">
+            <rect x="20" y="105" width="170" height="85" rx="12" fill="#1d4ed8" class="hover:fill-blue-600 transition"/>
+            <text x="105" y="145" fill="#dbeafe" font-size="15" font-weight="bold" text-anchor="middle">우심실 (RV)</text>
+            <text x="105" y="168" fill="#93c5fd" font-size="11" text-anchor="middle">피를 내보냄 (동맥)</text>
+          </g>
+
+          <!-- 좌심실 -->
+          <g id="box-lv" onclick="inspectChamber('좌심실', '온몸으로 피를 강하게 뿜어내는 가장 두꺼운 방! 대동맥과 연결.')" class="cursor-pointer transition group">
+            <rect x="210" y="105" width="170" height="85" rx="12" fill="#dc2626" stroke="#fb7185" stroke-width="2.5" class="hover:fill-red-600 transition"/>
+            <text x="295" y="145" fill="#fff" font-size="15" font-weight="bold" text-anchor="middle">좌심실 (LV)</text>
+            <text x="295" y="168" fill="#ffe4e6" font-size="11" font-weight="bold" text-anchor="middle">두꺼운 근육벽 (동맥)</text>
+          </g>
+        </svg>
+
+        <div id="chamber-info" class="mt-2 text-center text-xs font-semibold text-amber-300 h-5">
+          👆 구역을 누르면 상세 설명이 여기에 표시됩니다.
+        </div>
+      </div>
+
+      <!-- Multiple Choice Options -->
+      <div class="space-y-2 pt-1">
+        <button onclick="submitStage1(1)" class="w-full text-left p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm touch-btn flex items-center gap-3">
+          <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 font-bold flex items-center justify-center shrink-0">1</span>
+          <span>심방은 피를 내보내며 동맥과 연결되고, 심실은 피를 받아들이며 정맥과 연결된다.</span>
+        </button>
+        <button onclick="submitStage1(2)" class="w-full text-left p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm touch-btn flex items-center gap-3">
+          <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 font-bold flex items-center justify-center shrink-0">2</span>
+          <span class="text-rose-300 font-semibold">심방은 피를 받아들이는 곳(정맥 연결), 심실은 피를 내보내는 곳(동맥 연결)이다.</span>
+        </button>
+        <button onclick="submitStage1(3)" class="w-full text-left p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm touch-btn flex items-center gap-3">
+          <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 font-bold flex items-center justify-center shrink-0">3</span>
+          <span>심방과 심실은 모두 혈액을 모으기만 하며 혈관과는 연결되지 않는다.</span>
+        </button>
+      </div>
+
+      <div id="hint-box-1" class="hidden p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs"></div>
+    </section>
+
+    <!-- STAGE 2: 쫄깃한 염통의 비밀 (두꺼운 심실 근육) -->
+    <section id="screen-stage2" class="hidden space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+        <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 font-black text-xs font-mono border border-amber-500/30">GATE 02</span>
+        <span class="text-xs text-slate-400">교과서 213쪽 5~7줄</span>
+      </div>
+
+      <div class="space-y-1">
+        <h3 class="text-lg sm:text-xl font-bold text-white">Room 2: 쫄깃한 염통 근육의 비밀</h3>
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+          순대 가게의 염통(심장)이 쫄깃하고 질긴 이유는 무엇일까요? 단면도를 보고 교과서 핵심 문장의 암호를 완성하세요.
+        </p>
+      </div>
+
+      <!-- Interactive Cross-Section SVG -->
+      <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-800 flex flex-col items-center">
+        <div class="text-[11px] text-slate-400 mb-1 font-mono">▼ 심장 가로 단면 (좌심실 vs 우심실 근육 두께 비교)</div>
+        <svg viewBox="0 0 360 160" class="w-full max-w-xs mx-auto">
+          <!-- Background -->
+          <rect width="360" height="160" rx="12" fill="#020617"/>
+          <!-- 우심실 벽 (얇음) -->
+          <path d="M 120 30 C 50 30 30 80 30 110 C 30 140 80 150 140 150" fill="none" stroke="#3b82f6" stroke-width="12" stroke-linecap="round"/>
+          <text x="80" y="90" fill="#93c5fd" font-size="12" font-weight="bold" text-anchor="middle">우심실 벽 (얇음)</text>
+          
+          <!-- 좌심실 벽 (압도적으로 두꺼운 근육) -->
+          <circle cx="250" cy="90" r="50" fill="#450a0a" stroke="#ef4444" stroke-width="22"/>
+          <circle cx="250" cy="90" r="26" fill="#0f172a"/>
+          <text x="250" y="86" fill="#fecaca" font-size="12" font-weight="black" text-anchor="middle">좌심실 근육</text>
+          <text x="250" y="103" fill="#fb7185" font-size="10" font-weight="bold" text-anchor="middle">(약 3배 두꺼움!)</text>
+
+          <!-- Label -->
+          <line x1="250" y1="20" x2="250" y2="45" stroke="#fbbf24" stroke-width="2"/>
+          <text x="250" y="15" fill="#fbbf24" font-size="11" font-weight="bold" text-anchor="middle">염통의 핵심 쫄깃 부위!</text>
+        </svg>
+      </div>
+
+      <!-- Fill in the Blank Quest -->
+      <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2.5">
+        <div class="text-xs text-amber-300 font-semibold">📜 교과서 213쪽 암호문 복원 미션:</div>
+        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium bg-slate-950 p-3 rounded-lg border border-slate-800">
+          "심실은 심방보다 두껍고 탄력이 강한 근육으로 이루어져 있어 ( <span class="text-rose-400 font-bold">ㄱㅎㄱ</span> ) 수축하여 혈액을 ( <span class="text-amber-400 font-bold">ㄷㅁ</span> )(으)로 내보낸다."
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+          <div>
+            <label class="text-[11px] text-slate-400 font-medium">초성 ① 'ㄱㅎㄱ' 들어갈 말</label>
+            <input type="text" id="input-st2-1" placeholder="예: 강하게" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-400 text-center font-bold">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400 font-medium">초성 ② 'ㄷㅁ' 들어갈 말</label>
+            <input type="text" id="input-st2-2" placeholder="예: 동맥" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-400 text-center font-bold">
+          </div>
+        </div>
+      </div>
+
+      <button onclick="submitStage2()" class="w-full py-3.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm touch-btn shadow-lg transition">
+        암호 검증 및 다음 게이트 이동
+      </button>
+
+      <div id="hint-box-2" class="hidden p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs"></div>
+    </section>
+
+    <!-- STAGE 3: 역류 방지 판막과 혈액 흐름 -->
+    <section id="screen-stage3" class="hidden space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+        <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 font-black text-xs font-mono border border-emerald-500/30">GATE 03</span>
+        <span class="text-xs text-slate-400">교과서 213쪽 7~10줄</span>
+      </div>
+
+      <div class="space-y-1">
+        <h3 class="text-lg sm:text-xl font-bold text-white">Room 3: 역류 방지 밸브의 비밀</h3>
+        <p class="text-xs sm:text-sm text-slate-300">
+          피가 반대로 거꾸로 흐르는 사고를 방지하는 구조물의 이름과 올바른 혈액 이동 방향을 고르세요.
+        </p>
+      </div>
+
+      <!-- Valve Animation / SVG Graphic -->
+      <div class="p-3 bg-slate-900/90 rounded-2xl border border-slate-800 text-center">
+        <svg viewBox="0 0 360 100" class="w-full max-w-xs mx-auto">
+          <rect width="360" height="100" rx="14" fill="#0b1329"/>
+          <!-- Blood vessel tube -->
+          <rect x="25" y="30" width="310" height="40" rx="20" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <line x1="40" y1="50" x2="310" y2="50" stroke="#ef4444" stroke-width="4" stroke-dasharray="8,6"/>
+          
+          <!-- Valve Flaps -->
+          <line x1="170" y1="32" x2="200" y2="48" stroke="#38bdf8" stroke-width="5" stroke-linecap="round"/>
+          <line x1="170" y1="68" x2="200" y2="52" stroke="#38bdf8" stroke-width="5" stroke-linecap="round"/>
+
+          <text x="185" y="22" fill="#38bdf8" font-size="12" font-weight="bold" text-anchor="middle">일방통행 밸브 (판막)</text>
+          <text x="320" y="55" fill="#ef4444" font-size="16" font-weight="bold">→</text>
+        </svg>
+        <p class="text-[11px] text-slate-400 mt-1 font-medium">오직 한 방향으로만 열리고 거꾸로 흐르면 닫힙니다!</p>
+      </div>
+
+      <div class="space-y-2 pt-1">
+        <button onclick="submitStage3(1)" class="w-full text-left p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm touch-btn flex items-center gap-3">
+          <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 font-bold flex items-center justify-center shrink-0">A</span>
+          <span>이름은 <strong>모세혈관</strong>이며, [동맥 → 심실 → 심방]으로 역류한다.</span>
+        </button>
+        <button onclick="submitStage3(2)" class="w-full text-left p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm touch-btn flex items-center gap-3">
+          <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 font-bold flex items-center justify-center shrink-0">B</span>
+          <span class="text-emerald-300 font-semibold">이름은 <strong>판막</strong>이며, [심방 → 심실 → 동맥] 방향으로만 흐른다.</span>
+        </button>
+        <button onclick="submitStage3(3)" class="w-full text-left p-3.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs sm:text-sm touch-btn flex items-center gap-3">
+          <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 font-bold flex items-center justify-center shrink-0">C</span>
+          <span>이름은 <strong>판막</strong>이며, 혈액을 온몸에서 심실로 바로 빨아들인다.</span>
+        </button>
+      </div>
+
+      <div id="hint-box-3" class="hidden p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs"></div>
+    </section>
+
+    <!-- STAGE 4: 혈관 3총사 매칭 퀘스트 -->
+    <section id="screen-stage4" class="hidden space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+        <span class="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-400 font-black text-xs font-mono border border-purple-500/30">FINAL GATE</span>
+        <span class="text-xs text-slate-400">교과서 213쪽 하단 그림</span>
+      </div>
+
+      <div class="space-y-1">
+        <h3 class="text-lg sm:text-xl font-bold text-white">Final Gate: 혈관 3총사 정밀 매칭</h3>
+        <p class="text-xs sm:text-sm text-slate-300">
+          교과서 213쪽 하단 그림을 참고하여, 3가지 혈관 카드에 알맞은 이름을 탭하여 맞춰보세요.
+        </p>
+      </div>
+
+      <!-- 3 Vessel Cards with Select Options -->
+      <div class="space-y-3">
+        <!-- Vessel 1 -->
+        <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 text-xs font-bold flex items-center justify-center border border-rose-500/30">1</span>
+              <span class="text-sm font-bold text-white">혈관벽이 두껍고 탄력이 강해 높은 압력을 견딤</span>
+            </div>
+            <p class="text-xs text-slate-400 pl-7">심장에서 힘차게 나가는 혈액이 흐르는 혈관</p>
+          </div>
+          <select id="select-vessel-1" class="bg-slate-950 border border-slate-700 text-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:border-rose-500 focus:outline-none">
+            <option value="">혈관 선택 ▼</option>
+            <option value="동맥">동맥</option>
+            <option value="모세혈관">모세혈관</option>
+            <option value="정맥">정맥</option>
+          </select>
+        </div>
+
+        <!-- Vessel 2 -->
+        <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 text-xs font-bold flex items-center justify-center border border-purple-500/30">2</span>
+              <span class="text-sm font-bold text-white">혈관벽이 매우 얇아 세포와 물질 교환</span>
+            </div>
+            <p class="text-xs text-slate-400 pl-7">온몸에 그물처럼 퍼져 산소와 영양소를 전달</p>
+          </div>
+          <select id="select-vessel-2" class="bg-slate-950 border border-slate-700 text-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:border-purple-500 focus:outline-none">
+            <option value="">혈관 선택 ▼</option>
+            <option value="동맥">동맥</option>
+            <option value="모세혈관">모세혈관</option>
+            <option value="정맥">정맥</option>
+          </select>
+        </div>
+
+        <!-- Vessel 3 -->
+        <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold flex items-center justify-center border border-blue-500/30">3</span>
+              <span class="text-sm font-bold text-white">혈관벽이 얇고 곳곳에 판막이 존재</span>
+            </div>
+            <p class="text-xs text-slate-400 pl-7">혈압이 낮아 거꾸로 흐름을 막아야 하는 혈관</p>
+          </div>
+          <select id="select-vessel-3" class="bg-slate-950 border border-slate-700 text-slate-200 rounded-xl px-3 py-2 text-xs font-semibold focus:border-blue-500 focus:outline-none">
+            <option value="">혈관 선택 ▼</option>
+            <option value="동맥">동맥</option>
+            <option value="모세혈관">모세혈관</option>
+            <option value="정맥">정맥</option>
+          </select>
+        </div>
+      </div>
+
+      <button onclick="submitStage4()" class="w-full py-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-sm touch-btn shadow-lg transition mt-2">
+        최종 검증 및 프리패스 티켓 발급
+      </button>
+
+      <div id="hint-box-4" class="hidden p-3 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-200 text-xs"></div>
+    </section>
+
+    <!-- SUCCESS SCREEN: PASS TICKET -->
+    <section id="screen-success" class="hidden space-y-5 text-center">
+      <div>
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 border-2 border-emerald-500 text-3xl mb-2">
+          🎉
+        </div>
+        <h2 class="text-2xl font-black text-white">모든 보안 게이트 해독 완료!</h2>
+        <p class="text-xs text-slate-400 mt-1">교과서 212~213쪽 순환계의 핵심 구조를 완벽하게 정복했습니다.</p>
+      </div>
+
+      <!-- Verified Pass Ticket -->
+      <div class="relative bg-gradient-to-b from-slate-900 to-rose-950/40 border-2 border-rose-500/80 rounded-3xl p-6 text-left shadow-2xl overflow-hidden">
+        <!-- Stamp / Verified Badge -->
+        <div class="absolute right-3 top-3 w-20 h-20 rounded-full border-2 border-dashed border-emerald-400/70 flex flex-col items-center justify-center rotate-12 text-emerald-300 pointer-events-none">
+          <span class="text-[9px] font-black tracking-widest uppercase">LAB PASS</span>
+          <span class="text-xs font-black">검증완료</span>
+          <span class="text-[8px] font-mono" id="ticket-time">11:40</span>
+        </div>
+
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 uppercase">CERTIFIED RESEARCHER</span>
+        </div>
+
+        <h3 class="text-xl font-extrabold text-white tracking-tight">돼지 심장 관찰 연구실 우선 입장권</h3>
+        <p class="text-xs text-rose-300/80 mt-0.5 font-medium">실물 심실 근육 촉진 & 쫄깃한 염통 시식 허가</p>
+
+        <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-dashed border-rose-500/30 text-xs">
+          <div>
+            <span class="text-slate-400 block text-[11px]">연구 요원</span>
+            <span id="ticket-name" class="text-base font-extrabold text-white">홍길동</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px]">학번 코드</span>
+            <span id="ticket-id" class="text-base font-mono font-bold text-white">20101</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px]">마스터 영역</span>
+            <span class="text-emerald-400 font-semibold">심장 4개 방·판막·혈관 3종</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px]">성취 결과</span>
+            <span class="text-amber-400 font-mono font-bold">PASS 100% (4/4)</span>
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-[11px] text-slate-300 text-center font-medium leading-relaxed">
+          📱 <strong>이 화면을 그대로 들고 선생님께 보여주세요!</strong><br>
+          확인 후 위생 장갑을 받고 돼지 심장 관찰대로 이동합니다.
+        </div>
+      </div>
+
+      <button onclick="location.reload()" class="text-xs text-slate-400 hover:text-slate-200 underline">
+        처음부터 다시 플레이하기
+      </button>
+    </section>
+
+  </main>
+
+  <!-- Interactive Toast Notification -->
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl shadow-2xl text-xs sm:text-sm font-bold transition-all duration-300 opacity-0 pointer-events-none translate-y-3 z-50 flex items-center gap-2"></div>
+
+  <!-- Audio and Game Logic Script -->
+  <script>
+    // Audio Context (Web Audio API for zero dependencies)
+    let audioCtx = null;
+    let isSoundOn = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleSound() {
+      isSoundOn = !isSoundOn;
+      document.getElementById('sound-icon').textContent = isSoundOn ? '🔊' : '🔇';
+      showToast(isSoundOn ? '효과음이 켜졌습니다.' : '효과음이 꺼졌습니다.', true);
+    }
+
+    function playTone(freq, type, duration) {
+      if (!isSoundOn) return;
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playSuccess() {
+      playTone(523.25, 'triangle', 0.12);
+      setTimeout(() => playTone(659.25, 'triangle', 0.12), 100);
+      setTimeout(() => playTone(783.99, 'triangle', 0.25), 200);
+    }
+
+    function playError() {
+      playTone(220, 'sawtooth', 0.25);
+    }
+
+    // State Variables
+    let currentStage = 0;
+    let studentId = "";
+    let studentName = "";
+
+    const screens = [
+      document.getElementById('screen-lobby'),
+      document.getElementById('screen-stage1'),
+      document.getElementById('screen-stage2'),
+      document.getElementById('screen-stage3'),
+      document.getElementById('screen-stage4'),
+      document.getElementById('screen-success')
+    ];
+
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `fixed bottom-4 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl shadow-2xl text-xs sm:text-sm font-bold transition-all duration-300 z-50 flex items-center gap-2 ${
+        isSuccess ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
+      } opacity-100 translate-y-0`;
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-3');
+      }, 2400);
+    }
+
+    function setStage(index) {
+      currentStage = index;
+      screens.forEach((s, idx) => s.classList.toggle('hidden', idx !== index));
+
+      const wrapper = document.getElementById('progress-wrapper');
+      const bar = document.getElementById('progress-bar');
+      const text = document.getElementById('stage-text');
+
+      if (index >= 1 && index <= 4) {
+        wrapper.classList.remove('hidden');
+        bar.style.width = `${(index / 4) * 100}%`;
+        text.textContent = `STAGE ${index} / 4`;
+      } else {
+        wrapper.classList.add('hidden');
+      }
+    }
+
+    // Lobby submit
+    function handleStartGame(e) {
+      e.preventDefault();
+      initAudio();
+      studentId = document.getElementById('input-id').value.trim();
+      studentName = document.getElementById('input-name').value.trim();
+
+      if (!studentId || !studentName) return;
+
+      document.getElementById('badge-name').textContent = studentName;
+      document.getElementById('badge-id').textContent = `#${studentId}`;
+      document.getElementById('user-badge').classList.remove('hidden');
+
+      playSuccess();
+      showToast(`${studentName} 요원 등록 완료! 교과서를 참고하세요.`);
+      setStage(1);
+    }
+
+    // Interactive Chamber Inspector
+    function inspectChamber(name, desc) {
+      initAudio();
+      playTone(440, 'sine', 0.08);
+      document.getElementById('chamber-info').innerHTML = `🔍 <strong>${name}:</strong> ${desc}`;
+    }
+
+    // Stage 1
+    function submitStage1(choice) {
+      if (choice === 2) {
+        playSuccess();
+        showToast("정답! 심방은 받아들이고(정맥), 심실은 내보냅니다(동맥).");
+        setStage(2);
+      } else {
+        playError();
+        const hint = document.getElementById('hint-box-1');
+        hint.innerHTML = "💡 <strong>교과서 213쪽 3~5줄 힌트:</strong> 심방은 혈액을 심장으로 '받아들이는' 곳(정맥 연결), 심실은 '내보내는' 곳(동맥 연결)입니다!";
+        hint.classList.remove('hidden');
+        showToast("오답입니다. 교과서 213쪽 본문을 다시 읽어보세요!", false);
+      }
+    }
+
+    // Stage 2
+    function submitStage2() {
+      const v1 = document.getElementById('input-st2-1').value.replace(/\s+/g, '');
+      const v2 = document.getElementById('input-st2-2').value.replace(/\s+/g, '');
+
+      const isV1Correct = v1.includes("강하게");
+      const isV2Correct = v2.includes("동맥");
+
+      if (isV1Correct && isV2Correct) {
+        playSuccess();
+        showToast("암호 해독 성공! 심실은 강하게 수축해 동맥으로 피를 보냅니다.");
+        setStage(3);
+      } else {
+        playError();
+        const hint = document.getElementById('hint-box-2');
+        hint.innerHTML = "💡 <strong>교과서 213쪽 6~7줄 힌트:</strong> '심실은 심방보다 두껍고 탄력이 강한 근육으로 이루어져 있어 <strong>강하게</strong> 수축하여 혈액을 <strong>동맥</strong>으로 내보낸다.'";
+        hint.classList.remove('hidden');
+        showToast("오답입니다. 초성 힌트를 교과서에서 찾아보세요!", false);
+      }
+    }
+
+    // Stage 3
+    function submitStage3(choice) {
+      if (choice === 2) {
+        playSuccess();
+        showToast("정답! 판막이 있어 혈액은 [심방 → 심실 → 동맥]으로만 흐릅니다.");
+        setStage(4);
+      } else {
+        playError();
+        const hint = document.getElementById('hint-box-3');
+        hint.innerHTML = "💡 <strong>교과서 213쪽 8~10줄 힌트:</strong> 심방과 심실 사이, 심실과 동맥 사이에는 <strong>판막</strong>이 있어 거꾸로 흐르지 않습니다.";
+        hint.classList.remove('hidden');
+        showToast("오답입니다. 판막의 위치와 역할을 확인하세요!", false);
+      }
+    }
+
+    // Stage 4
+    function submitStage4() {
+      const v1 = document.getElementById('select-vessel-1').value;
+      const v2 = document.getElementById('select-vessel-2').value;
+      const v3 = document.getElementById('select-vessel-3').value;
+
+      if (v1 === '동맥' && v2 === '모세혈관' && v3 === '정맥') {
+        playSuccess();
+        document.getElementById('ticket-name').textContent = studentName;
+        document.getElementById('ticket-id').textContent = studentId;
+
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        document.getElementById('ticket-time').textContent = timeStr;
+
+        setStage(5);
+        showToast("축하합니다! 최종 프리패스 티켓이 발급되었습니다.");
+      } else {
+        playError();
+        const hint = document.getElementById('hint-box-4');
+        hint.innerHTML = "💡 <strong>교과서 213쪽 하단 힌트:</strong> 높은 압력 견딤 = <strong>동맥</strong>, 얇은 벽 물질 교환 = <strong>모세혈관</strong>, 판막 존재 = <strong>정맥</strong>";
+        hint.classList.remove('hidden');
+        showToast("혈관 연결이 틀렸습니다. 213쪽 하단 그림을 확인하세요!", false);
+      }
+    }
+  </script>
+</body>
+</html>
